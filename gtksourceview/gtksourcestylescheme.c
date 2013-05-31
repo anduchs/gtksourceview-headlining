@@ -891,6 +891,7 @@ parse_style (GtkSourceStyleScheme *scheme,
 	gboolean italic = FALSE;
 	gboolean underline = FALSE;
 	gboolean strikethrough = FALSE;
+	xmlChar *scale = NULL;
 	xmlChar *tmp;
 
 	tmp = xmlGetProp (node, BAD_CAST "name");
@@ -937,10 +938,11 @@ parse_style (GtkSourceStyleScheme *scheme,
 	get_bool (node, "bold", &mask, GTK_SOURCE_STYLE_USE_BOLD, &bold);
 	get_bool (node, "underline", &mask, GTK_SOURCE_STYLE_USE_UNDERLINE, &underline);
 	get_bool (node, "strikethrough", &mask, GTK_SOURCE_STYLE_USE_STRIKETHROUGH, &strikethrough);
+	scale = xmlGetProp (node, BAD_CAST "scale");
 
 	if (use_style)
 	{
-		if (fg != NULL || bg != NULL || line_bg != NULL || mask != 0)
+		if (fg != NULL || bg != NULL || line_bg != NULL || mask != 0 || scale != NULL)
 		{
 			g_set_error (error, ERROR_QUARK, 0,
 				     "in style '%s': style attributes used along with use-style",
@@ -982,6 +984,11 @@ parse_style (GtkSourceStyleScheme *scheme,
 		{
 			result->line_background = g_intern_string ((char*) line_bg);
 			result->mask |= GTK_SOURCE_STYLE_USE_LINE_BACKGROUND;
+		}
+		if (scale != NULL)
+		{
+			result->scale = g_intern_string ((char*) scale);
+			result->mask |= GTK_SOURCE_STYLE_USE_SCALE;
 		}
 	}
 
